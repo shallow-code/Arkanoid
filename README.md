@@ -7,7 +7,7 @@ al fine di non avere componenti sproporzionate, dobbiamo capire qual'è la dimen
     &nbsp; - piattaforma (mossa dal giocatore): altezza, larghezza, grafica <br />
     &nbsp; - mattoncino: altezza, larghezza, grafica <br />
     &nbsp; - schermo: altezza, largezza, (schermo intero?) <br />
-    &nbsp; grafica, discutere se interire e come inserire: <br />
+    &nbsp; grafica, discutere se inserire e come inserire: <br />
     &nbsp;&nbsp;&nbsp; - vite: quante, dove <br />
     &nbsp;&nbsp;&nbsp; - punteggio: dove, tipo carattere, dimensione <br />
     &nbsp;&nbsp;&nbsp; - bordo dello schermo sul quale far rimbalzare la pallina: spessore <br />
