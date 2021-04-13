@@ -20,6 +20,10 @@ meccaniche di gioco e funzioni da considerare:
     * impostazione livelli (bassa priorità)
 
 ## Proposte
-        
+Propongo come unità di misura una quantità chiama "delta" dove delta = 20 pixel. Voglio esprimere tutte le dimensioni in funzione di delta per mantenere sempre costanti le proporzioni. Indicativamente l'altezza di un mattoncino sarà pari a 1 delta.
+Ripercorrendo i vari punti:
+      * pallina: diametro = 1 delta, colore = bianco
+      * piattaforma: altezza = 1.5 delta, larghezza = 6 delta, grafica = un rettangolo grigio con mezzi cerchi sui lati arancioni
+      * 
   
               
