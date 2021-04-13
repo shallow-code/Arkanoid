@@ -8,7 +8,7 @@ al fine di non avere componenti sproporzionate, dobbiamo capire qual'è la dimen
     - mattoncino: altezza, larghezza, grafica <br />
     - schermo: altezza, largezza, (schermo intero?) <br />
     - grafica, discutere se interire e come inserire: <br />
-        >- vite: quante, dove <br />
+        > - vite: quante, dove <br />
         - punteggio: dove, tipo carattere, dimensione <br />
         - bordo dello schermo sul quale far rimbalzare la pallina: spessore <br />
         - presenza spazio dedicato per info quali: vita, livello, punteggio, potere attivo
