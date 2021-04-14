@@ -58,7 +58,3 @@ def SetGrid(path_to_rosetta):
 	return bricks
 
 
-
-
-	def print(self):
-		print(self.grid)
