@@ -8,9 +8,9 @@ from pyglet.window import key
 #starting settings
 fase_of_game = 'main_game'
 main_batch = pyglet.graphics.Batch()
-window_height = 600
+window_height = 400
 window_width = 600
-speed_platform = 200
+speed_platform = 500
 
 #create window
 game_window = pyglet.window.Window(window_width, window_height)
@@ -24,8 +24,20 @@ forestrings = pyglet.graphics.OrderedGroup(2)
 #path
 pyglet.resource.path=['./resources']
 pyglet.resource.reindex()
+
+
+
 #load img
-platform_image = pyglet.resource.image("example_body.png")
+platform_image = pyglet.resource.image("Vault_Base_1.png")
+
+Vault_Base_1 = pyglet.resource.image("Vault_Base_1.png")
+Vault_Base_2 = pyglet.resource.image("Vault_Base_2.png")
+Vault_Base_3 = pyglet.resource.image("Vault_Base_3.png")
+
+seq_anim_vault=[Vault_Base_1,Vault_Base_2,Vault_Base_3]
+vault_anim = pyglet.image.Animation.from_image_sequence(seq_anim_vault, 0.25, loop=True)
+
+
 
 def center_image(image):
     image.anchor_x = image.width // 2
@@ -34,6 +46,9 @@ def center_image(image):
 #centro immagini
 center_image(platform_image)
 
+center_image(Vault_Base_1)
+center_image(Vault_Base_2)
+center_image(Vault_Base_3)
 
 #CLASS
 #player
@@ -47,13 +62,17 @@ class Player(pyglet.sprite.Sprite):
     def update(self,dt):
         if self.key_handler[key.LEFT]:
             self.x -= self.V_x * dt
+            if self.x < platform_image.width//2:
+                self.x=platform_image.width//2
+
         if self.key_handler[key.RIGHT]:
             self.x += self.V_x * dt
-
+            if self.x > window_width - platform_image.width//2:
+                self.x=window_width - platform_image.width//2
 
 
 #stat game
-Player = Player(img=platform_image, x=window_width//2 ,y=10+platform_image.height//2, batch = main_batch, group=foreground)
+Player = Player(img=vault_anim, x=window_width//2 ,y=10+platform_image.height//2, batch = main_batch, group=foreground)
 print(window_width//2 ,10+platform_image.height//2)
 
 #movement control

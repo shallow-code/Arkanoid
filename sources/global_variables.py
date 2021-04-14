@@ -28,6 +28,9 @@ bricks_im["2A"] = pyglet.resource.image("Type2A.png")
 bricks_im["3"] = pyglet.resource.image("Type3.png")
 bricks_im["4"] = pyglet.resource.image("Type4.png")
 
+for key in bricks_im.keys():
+	center_image(bricks_im[key])
+
 #immagini navicella
 Vault_Base_1 = pyglet.resource.image("Vault_Base_1.png")
 Vault_Base_2 = pyglet.resource.image("Vault_Base_2.png")
