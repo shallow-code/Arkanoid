@@ -18,6 +18,11 @@ vault_W=73
 
 
 speed_platform=500
+speed_ball=400
+
+
+pallina_im=pyglet.resource.image("Palla_base.png")
+center_image(pallina_im)
 
 bricks_im={}
 bricks_im["1"]= pyglet.resource.image("Type1.png")
@@ -25,6 +30,7 @@ bricks_im["2R"] = pyglet.resource.image("Type2R.png")
 bricks_im["2Y"] = pyglet.resource.image("Type2Y.png")
 bricks_im["2B"] = pyglet.resource.image("Type2B.png")
 bricks_im["2A"] = pyglet.resource.image("Type2A.png")
+bricks_im["2W"] = pyglet.resource.image("Type2W.png")
 bricks_im["3"] = pyglet.resource.image("Type3.png")
 bricks_im["4"] = pyglet.resource.image("Type4.png")
 
@@ -53,4 +59,8 @@ center_image(vault_base)
 main_batch = pyglet.graphics.Batch()
 background = pyglet.graphics.OrderedGroup(0)
 foreground = pyglet.graphics.OrderedGroup(1)
+forestrings = pyglet.graphics.OrderedGroup(2)
+
+global flashes
+flashes=[]
 
