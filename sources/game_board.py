@@ -14,29 +14,35 @@ import sources.global_variables as globvars
 
 
 class Brick(pyglet.sprite.Sprite):
-    def __init__(self, btype,grid_X,grid_Y,*args, **kwargs):
-        super(Brick,self).__init__(img=globvars.bricks_im[btype], *args, **kwargs)
+	def __init__(self, btype,redivivo=False,*args, **kwargs):
+		super(Brick,self).__init__(img=globvars.bricks_im[btype], *args, **kwargs)
 
-        self.life=1
-        self.grid_X=grid_X
-        self.grid_Y=grid_Y
-        self.btype=btype
-        self.isdead=False
+		self.life=1
 
-        if btype=="4":
-        	self.life=9999
+		self.btype=btype
+		self.isdead=False
+		self.redivivo=redivivo
 
-        if btype=="1":
-        	self.life=2
+		if btype=="4":
+			self.life=-1
+
+		if btype=="1" or (btype=="3" and not self.redivivo):
+			self.life=2
+
+		if btype=="3" and self.redivivo:
+			pyglet.clock.schedule_once(self.rise_life,10)
+
+	def rise_life(self,delay):
+		self.life=2
+
+
+
 
 
 # classe che crea il muro di blocchi
 # la griglia è 27x13 blocchi
 
 def SetGrid(path_to_rosetta):
-
-
-	bricks=[]
 
 	#leggo file di costruzione da utils
 	with open(path_to_rosetta) as csv_file:
@@ -52,9 +58,8 @@ def SetGrid(path_to_rosetta):
 
 				#creo il mattoncino
 				if btype!="0":
-					brick=Brick(x=board_x ,y=board_y,batch = globvars.main_batch, group=globvars.foreground, btype=btype, grid_X=j, grid_Y=i)
-					bricks.append(brick)
+					brick=Brick(x=board_x ,y=board_y,batch = globvars.main_batch, group=globvars.foreground, btype=btype)
+					globvars.alive_bricks.append(brick)
 
-	return bricks
 
 

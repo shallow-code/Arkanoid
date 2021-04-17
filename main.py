@@ -11,19 +11,28 @@ game_window = pyglet.window.Window(globvars.board_W, globvars.board_H)
 background_sprite = pyglet.sprite.Sprite(globvars.background_image, batch=globvars.main_batch, group=globvars.background)
 
 #Creo la griglia (mattoncini) di gioco: si inzia dal livello 1; poi si dovrà riaggiornarlo
-bricks=SetGrid("utils\\Rosettas\\Test.csv")
+SetGrid("utils\\Rosettas\\Test.csv")
 
 #Creo la navicella
 vault=Player(x=globvars.board_W/2 ,y=25 ,batch = globvars.main_batch, group=globvars.foreground, vault_state="0")
-#globvars.board_W/2
+
 #Creo pallina
 pallina=Pallina(x=globvars.board_W/2 ,y=40 ,batch = globvars.main_batch, group=globvars.foreground)
 
+
+
+def resuscita_blocco(delay,x,y):
+	brick=Brick(x=x ,y=y,batch = globvars.main_batch, group=globvars.foreground, btype="3",redivivo=True)
+	brick.life=1
+	globvars.alive_bricks.append(brick)
+
+
 #update positions
 def update(dt):
+
+
 	vault.update(dt)
 	pallina.update(dt)
-	flash = pyglet.sprite.Sprite(img=globvars.bricks_im["2W"] ,x=0 ,y=0, batch = globvars.main_batch, group=globvars.forestrings)
 
 
 	#pallina colpisce navicella
@@ -42,8 +51,9 @@ def update(dt):
 	
 
 	collided_bricks=[]
+
 	# controlla se pallina colpisce mattoncino
-	for brick in bricks:
+	for brick in globvars.alive_bricks:
 
 
 		# la pallina si trova dentro il mattoncino
@@ -53,60 +63,41 @@ def update(dt):
 
 			case=-1
 
+			if not (pallina.last_x <= brick.x + brick.width/2 and pallina.last_x >= brick.x - brick.width/2):
+				pallina.V_x*=-1
+
+			if not (pallina.last_y <= brick.y + brick.height/2 and pallina.last_y >= brick.y - brick.height/2):
+				pallina.V_y*=-1
+
+			brick.life-=1
 			collided_bricks.append(brick)
 
-			if (pallina.last_y>=brick.y+brick.height/2) and (pallina.y<brick.y+brick.height/2):
-				case=0
-
-			if (pallina.last_y<=brick.y-brick.height/2) and (pallina.y>brick.y-brick.height/2):
-				case=1
-
-			if (pallina.last_x<=brick.x-brick.width/2) and (pallina.x>brick.x-brick.width/2):
-				case=2
-
-			if (pallina.last_x>=brick.x+brick.width/2) and (pallina.x<brick.x+brick.width/2):
-				case=3
-
-
-			if case==-1:
-
-				print("colpito blocco",brick.grid_X,brick.grid_Y)
-				print("velocità pallina",pallina.V_x,pallina.V_y)
-				print("pallina last p",pallina.last_x, pallina.last_y)
-				print("pallina p",pallina.x, pallina.y)
-				print("brick dx",brick.x+brick.width/2)
-				print("brick sx",brick.x-brick.width/2)
-				print("brick su",brick.y+brick.height/2)
-				print("brick giu",brick.y-brick.height/2)
-				print("case",case)
-				print("\n")
-
-
-			#ha colpito su
-			if case==0:
-				pallina.V_y*=-1
-				pallina.y=brick.y + brick.height/2 
-
-			#ha colpito down
-			if case==1:
-				pallina.V_y*=-1
-				pallina.y=brick.y - brick.height/2 
-
-			# ha colpito a sx 
-			if case==2:
-				pallina.V_x*=-1
-				pallina.x=brick.x - brick.width/2 
-
-			# ha colpito a dx
-			if case==3:
-				pallina.V_x*=-1
-				pallina.x=brick.x + brick.width/2 
-
+		if brick.life==0:
+			brick.isdead=True
 	
-#	for brick in collided_bricks:
-#		print(brick.x,brick.y)
-#		flash = pyglet.sprite.Sprite(img=globvars.bricks_im["2W"] ,x=brick.x ,y=brick.y, batch = globvars.main_batch, group=globvars.forestrings)
+	for brick in collided_bricks:
+		if not brick.isdead:
+			globvars.flashes.append(Flash(x=brick.x ,y=brick.y, batch = globvars.main_batch, group=globvars.forestrings))
+	
 
+	for f in globvars.flashes:
+		if f.isdead:
+			f.delete()
+			globvars.flashes.remove(f)
+
+	for brick in globvars.alive_bricks:
+		if brick.isdead:
+
+			x=brick.x
+			y=brick.y
+
+			brick.delete()
+			globvars.alive_bricks.remove(brick)
+
+			if brick.btype=="3":
+				pyglet.clock.schedule_once(resuscita_blocco, delay=10,x=x,y=y) 
+
+			
 
 #event handlers
 game_window.push_handlers(vault.key_handler)
@@ -118,5 +109,5 @@ def on_draw():
 	globvars.main_batch.draw()
 
 if __name__ == '__main__':
-	pyglet.clock.schedule_interval(update, 1/400.0) 
+	pyglet.clock.schedule_interval(update, 1/200.0) 
 	pyglet.app.run()

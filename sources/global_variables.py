@@ -64,3 +64,5 @@ forestrings = pyglet.graphics.OrderedGroup(2)
 global flashes
 flashes=[]
 
+global alive_bricks
+alive_bricks=[]
