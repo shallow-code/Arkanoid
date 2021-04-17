@@ -1,42 +1,7 @@
 import pyglet
 import csv
 import sources.global_variables as globvars
-
-
-
-#classe generica (basata sugli sprite) che definisce i blocchi
-#TO DO: inserire animazioni blocco 3 e capsule 
-
-# 1 -> blocco vita 2
-# 2 -> blocco colorato
-# 3 -> blocco che si rigenera
-# 4 -> blocco immortale
-
-
-class Brick(pyglet.sprite.Sprite):
-	def __init__(self, btype,redivivo=False,*args, **kwargs):
-		super(Brick,self).__init__(img=globvars.bricks_im[btype], *args, **kwargs)
-
-		self.life=1
-
-		self.btype=btype
-		self.isdead=False
-		self.redivivo=redivivo
-
-		if btype=="4":
-			self.life=-1
-
-		if btype=="1" or (btype=="3" and not self.redivivo):
-			self.life=2
-
-		if btype=="3" and self.redivivo:
-			pyglet.clock.schedule_once(self.rise_life,10)
-
-	def rise_life(self,delay):
-		self.life=2
-
-
-
+from sources.oggetti import *
 
 
 # classe che crea il muro di blocchi

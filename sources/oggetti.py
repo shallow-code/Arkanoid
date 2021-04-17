@@ -7,7 +7,7 @@ import math
 
 #player
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, vault_state, *args, **kwargs):
+    def __init__(self, vault_state="0", *args, **kwargs):
         super().__init__(img=globvars.vault_anim_states[vault_state], *args, **kwargs)
 
         self.isdead = False
@@ -15,18 +15,24 @@ class Player(pyglet.sprite.Sprite):
 
         self.key_handler = key.KeyStateHandler()
         self.V_x = globvars.speed_platform
-        
+
+        pyglet.clock.schedule_once(self.alive_animation,1)
+
 
     def update(self,dt):
-        if self.key_handler[key.LEFT]:
-            self.x -= self.V_x * dt
-            if self.x < globvars.vault_W//2:
-                self.x=globvars.vault_W//2
 
-        if self.key_handler[key.RIGHT]:
-            self.x += self.V_x * dt
-            if self.x > globvars.board_W - globvars.vault_W//2:
-                self.x=globvars.board_W - globvars.vault_W//2
+        if self.state!="0":
+            if self.key_handler[key.LEFT]:
+                self.x -= self.V_x * dt
+                if self.x < globvars.vault_W//2:
+                    self.x=globvars.vault_W//2
+
+            if self.key_handler[key.RIGHT]:
+                self.x += self.V_x * dt
+                if self.x > globvars.board_W - globvars.vault_W//2:
+                    self.x=globvars.board_W - globvars.vault_W//2
+
+
 
 
     def get_ball_new_angle(self, hit_position):
@@ -34,13 +40,20 @@ class Player(pyglet.sprite.Sprite):
         return ( - 0.5*(hit_position) * (pi) / self.width)
 
 
+    def alive_animation(self,delay):
+        self.state="1"
+        self.image=globvars.vault_anim_states["1"]
+
+
+
 
 class Pallina(pyglet.sprite.Sprite):
     def __init__(self, *args, **kwargs):
-        super().__init__(img=globvars.pallina_im, *args, **kwargs)
+        super().__init__(img=globvars.pallina_start, *args, **kwargs)
 
         self.isdead = False
         self.isMoving=False
+        self.state="0"
 
         self.key_handler = key.KeyStateHandler()
 
@@ -51,10 +64,12 @@ class Pallina(pyglet.sprite.Sprite):
         self.last_x=self.x
         self.last_y=self.y
 
-        self.nw=(self.x-self.width/2,self.y+self.height/2)
-        self.ne=(self.x+self.width/2,self.y+self.height/2)
-        self.sw=(self.x-self.width/2,self.y-self.height/2)
-        self.se=(self.x+self.width/2,self.y-self.height/2)
+        pyglet.clock.schedule_once(self.start,delay=1)
+
+    def start(self,delay):
+        self.image=globvars.pallina_im
+        self.state="1"
+
 
     def get_distance(self,point):
         return math.sqrt((math.pow(self.x-point[0],2)+math.pow(self.y-point[1],2)))
@@ -66,41 +81,45 @@ class Pallina(pyglet.sprite.Sprite):
         self.last_y=self.y
 
         #se la pallina non si muove ancora, segue la navicella
-        if not self.isMoving:
-            if self.key_handler[key.LEFT]:
-                self.x -= self.V_x * dt
-                if self.x < globvars.vault_W//2:
-                    self.x=globvars.vault_W//2
+        if self.state!="0":
+            if not self.isMoving:
+                if self.key_handler[key.LEFT]:
+                    self.x -= self.V_x * dt
+                    if self.x < globvars.vault_W//2:
+                        self.x=globvars.vault_W//2
 
-            if self.key_handler[key.RIGHT]:
-                self.x += self.V_x * dt
-                if self.x > globvars.board_W - globvars.vault_W//2:
-                    self.x=globvars.board_W - globvars.vault_W//2
+                if self.key_handler[key.RIGHT]:
+                    self.x += self.V_x * dt
+                    if self.x > globvars.board_W - globvars.vault_W//2:
+                        self.x=globvars.board_W - globvars.vault_W//2
 
-            #la pallina inizia a muoversi
-            if self.key_handler[key.UP]:           
+                #la pallina inizia a muoversi
+                if self.key_handler[key.UP]:           
 
-                self.isMoving=True
-                self.V_x=0
-                self.V_y=globvars.speed_ball
+                    self.isMoving=True
+                    self.V_x=globvars.speed_ball*math.cos(math.pi/4)
+                    self.V_y=globvars.speed_ball*math.sin(math.pi/4)
 
-        else:
-            #faccio attenzione ai bordi del gioco        
-            self.y +=  self.V_y * dt
-            self.x +=  self.V_x * dt
+            else:
+                #faccio attenzione ai bordi del gioco        
+                self.y +=  self.V_y * dt
+                self.x +=  self.V_x * dt
 
-            if self.y >= globvars.board_H:
-                self.V_y*=-1
-                self.y = globvars.board_H
+                if self.y >= globvars.board_H:
+                    self.V_y*=-1
+                    self.y = globvars.board_H
 
-            if self.x >= globvars.board_W: 
-                self.V_x*=-1
-                self.x=globvars.board_W
+                if self.x >= globvars.board_W: 
+                    self.V_x*=-1
+                    self.x=globvars.board_W
 
 
-            if self.x <= 0:
-                self.V_x*=-1
-                self.x=0
+                if self.x <= 0:
+                    self.V_x*=-1
+                    self.x=0
+
+                if self.y<=0:
+                    self.isdead=True
 
 
 
@@ -114,3 +133,33 @@ class Flash(pyglet.sprite.Sprite):
 
     def die(self,dt):
         self.isdead=True
+
+
+
+# 1 -> blocco vita 2
+# 2 -> blocco colorato
+# 3 -> blocco che si rigenera
+# 4 -> blocco immortale
+
+
+class Brick(pyglet.sprite.Sprite):
+    def __init__(self, btype,redivivo=False,*args, **kwargs):
+        super(Brick,self).__init__(img=globvars.bricks_im[btype], *args, **kwargs)
+
+        self.life=1
+
+        self.btype=btype
+        self.isdead=False
+        self.redivivo=redivivo
+
+        if btype=="4":
+            self.life=-1
+
+        if btype=="1" or (btype=="3" and not self.redivivo):
+            self.life=2
+
+        if btype=="3" and self.redivivo:
+            pyglet.clock.schedule_once(self.rise_life,10)
+
+    def rise_life(self,delay):
+        self.life=2
