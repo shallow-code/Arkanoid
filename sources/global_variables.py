@@ -8,8 +8,10 @@ def center_image(image):
 pyglet.resource.path = ['resources',"resources\\im","resources\\audio"]
 pyglet.resource.reindex()
 
-board_W=546
-board_H=459
+board_W=586
+board_H=499
+board_RLMargin=20
+
 brick_W=42
 brick_H=17
 grid_W=27
@@ -80,12 +82,12 @@ center_image(vita_im)
 
 
 
-background_image = pyglet.resource.image("Background11.png")
-
+background_image = pyglet.resource.image("BackgroundBig1.png")
+cornice_image = pyglet.resource.image("Cornice.png")
+mangione_image = pyglet.resource.image("Mangione2.png")
+center_image(mangione_image)
 
 #vault images
-# vault_base=pyglet.resource.image("Vault_Base.png")
-# center_image(vault_base)
 
 main_batch = pyglet.graphics.Batch()
 background = pyglet.graphics.OrderedGroup(0)
@@ -109,3 +111,8 @@ vault=None
 global palline
 palline=[]
 global background_sprite
+global cornice_sprite
+
+#provvisorio
+global mangione1
+global mangione2

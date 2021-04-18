@@ -22,13 +22,21 @@ def crea_livello():
 
 	#creo il background
 	globvars.background_sprite = pyglet.sprite.Sprite(globvars.background_image, batch=globvars.main_batch, group=globvars.background)
+	
+	#creo cornice
+	globvars.cornice_sprite = pyglet.sprite.Sprite(globvars.cornice_image, batch=globvars.main_batch, group=globvars.background)
+
+	#creo mangioni
+	#globvars.Mangioni.append()
+	globvars.mangione1=pyglet.sprite.Sprite(globvars.mangione_image,x=globvars.board_W/4 ,y=globvars.board_H-12 , batch=globvars.main_batch, group=globvars.foreground)
+	globvars.mangione2=pyglet.sprite.Sprite(globvars.mangione_image,x=3*globvars.board_W/4 ,y=globvars.board_H-12 , batch=globvars.main_batch, group=globvars.foreground)
 
 	#Creo la griglia (mattoncini) di gioco: si inzia dal livello 1; poi si dovrà riaggiornarlo
 	SetGrid("utils\\Rosettas\\Test.csv")
 
 
 	for i in range(globvars.lifes):
-		globvars.l_lifes.append(pyglet.sprite.Sprite(globvars.vita_im, 10+i*25,10, batch=globvars.main_batch, group=globvars.foreground))
+		globvars.l_lifes.append(pyglet.sprite.Sprite(globvars.vita_im, globvars.board_RLMargin+ 10+i*25,10, batch=globvars.main_batch, group=globvars.foreground))
 
 
 	crea_giocatore()
@@ -103,7 +111,7 @@ def update(dt):
 			# controlla se pallina colpisce mattoncino
 			for brick in globvars.alive_bricks:
 
-				
+
 				# la pallina si trova dentro il mattoncino
 				if (pallina.x  <= brick.x + brick.width/2 and pallina.x >= brick.x - brick.width/2) \
 				and(pallina.y  <= brick.y+brick.height/2 and pallina.y  >= brick.y-brick.height/2):

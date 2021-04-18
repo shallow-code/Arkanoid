@@ -19,7 +19,7 @@ def SetGrid(path_to_rosetta):
 
 				#converto in coordinate pixel
 				board_y=globvars.board_H-i*globvars.brick_H-globvars.brick_H//2
-				board_x=j*globvars.brick_W+globvars.brick_W//2
+				board_x=j*globvars.brick_W+globvars.brick_W//2+globvars.board_RLMargin
 
 				#creo il mattoncino
 				if btype!="0":

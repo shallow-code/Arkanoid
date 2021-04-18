@@ -24,13 +24,13 @@ class Player(pyglet.sprite.Sprite):
         if self.state!="0":
             if self.key_handler[key.LEFT]:
                 self.x -= self.V_x * dt
-                if self.x < globvars.vault_W//2:
-                    self.x=globvars.vault_W//2
+                if self.x < globvars.vault_W//2 + globvars.board_RLMargin:
+                    self.x=globvars.vault_W//2 + globvars.board_RLMargin
 
             if self.key_handler[key.RIGHT]:
                 self.x += self.V_x * dt
-                if self.x > globvars.board_W - globvars.vault_W//2:
-                    self.x=globvars.board_W - globvars.vault_W//2
+                if self.x > globvars.board_W - globvars.vault_W//2 - globvars.board_RLMargin:
+                    self.x=globvars.board_W - globvars.vault_W//2 - globvars.board_RLMargin
 
 
 
@@ -85,13 +85,13 @@ class Pallina(pyglet.sprite.Sprite):
             if not self.isMoving:
                 if self.key_handler[key.LEFT]:
                     self.x -= self.V_x * dt
-                    if self.x < globvars.vault_W//2:
-                        self.x=globvars.vault_W//2
+                    if self.x < globvars.vault_W//2 + globvars.board_RLMargin:
+                        self.x=globvars.vault_W//2 + globvars.board_RLMargin
 
                 if self.key_handler[key.RIGHT]:
                     self.x += self.V_x * dt
-                    if self.x > globvars.board_W - globvars.vault_W//2:
-                        self.x=globvars.board_W - globvars.vault_W//2
+                    if self.x > globvars.board_W - globvars.vault_W//2 - globvars.board_RLMargin:
+                        self.x=globvars.board_W - globvars.vault_W//2 - globvars.board_RLMargin
 
                 #la pallina inizia a muoversi
                 if self.key_handler[key.UP]:           
@@ -105,18 +105,18 @@ class Pallina(pyglet.sprite.Sprite):
                 self.y +=  self.V_y * dt
                 self.x +=  self.V_x * dt
 
-                if self.y >= globvars.board_H:
+                if self.y >= globvars.board_H - globvars.board_RLMargin:
                     self.V_y*=-1
-                    self.y = globvars.board_H
+                    self.y = globvars.board_H - globvars.board_RLMargin
 
-                if self.x >= globvars.board_W: 
+                if self.x >= globvars.board_W - globvars.board_RLMargin: 
                     self.V_x*=-1
-                    self.x=globvars.board_W
+                    self.x=globvars.board_W - globvars.board_RLMargin
 
 
-                if self.x <= 0:
+                if self.x <= globvars.board_RLMargin:
                     self.V_x*=-1
-                    self.x=0
+                    self.x= globvars.board_RLMargin
 
                 if self.y<=0:
                     self.isdead=True
