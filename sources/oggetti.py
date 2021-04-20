@@ -2,7 +2,7 @@ import pyglet
 import sources.global_variables as globvars
 from pyglet.window import key
 import math
-
+import random
 
 
 #player
@@ -97,8 +97,8 @@ class Pallina(pyglet.sprite.Sprite):
                 if self.key_handler[key.UP]:           
 
                     self.isMoving=True
-                    self.V_x=globvars.speed_ball*math.cos(math.pi/4)
-                    self.V_y=globvars.speed_ball*math.sin(math.pi/4)
+                    self.V_x=globvars.speed_ball*math.cos(math.pi/3)
+                    self.V_y=globvars.speed_ball*math.sin(math.pi/3)
 
             else:
                 #faccio attenzione ai bordi del gioco        
@@ -136,6 +136,25 @@ class Flash(pyglet.sprite.Sprite):
 
 
 
+class Mangione(pyglet.sprite.Sprite):
+    def __init__(self,last_used,*args, **kwargs):
+        super(Mangione,self).__init__(img=globvars.Mangione[0], *args, **kwargs)
+        
+        self.lastUsed=last_used
+
+    def cambiaStato(self):
+        if self.lastUsed:
+            self.lastUsed=False
+        else:
+            self.lastUsed=True
+
+    def apritiSesamo(self):
+        #print("dentro")
+        self.image=globvars.Mangione_anim
+
+
+
+
 # 1 -> blocco vita 2
 # 2 -> blocco colorato
 # 3 -> blocco che si rigenera
@@ -163,3 +182,60 @@ class Brick(pyglet.sprite.Sprite):
 
     def rise_life(self,delay):
         self.life=2
+
+
+
+class Enemy(pyglet.sprite.Sprite):
+    def __init__(self,etype, *args, **kwargs):
+        super().__init__(img=globvars.Enemies[etype], *args, **kwargs)
+        
+        self.life=1
+        self.isdead=False
+        self.direction=3*math.pi/2
+
+        self.directionList=[0,math.pi,3*math.pi/2]
+        self.forbiddenDirections=[]
+        self.percorso=0
+
+        self.V=globvars.speed_enemy
+        self.last_x=self.x
+        self.last_y=self.y
+        self.deltax=0
+        self.deltay=0
+
+
+    def update(self,dt):
+
+        if self.percorso>100:
+            self.new_direction()
+            self.percorso=0
+
+        self.deltax=math.cos(self.direction)*self.V*dt
+        self.deltay=math.sin(self.direction)*self.V*dt
+
+        #print(deltax)
+        self.last_x=self.x
+        self.last_y=self.y
+
+        self.x+=self.deltax
+        self.y+=self.deltay
+
+        self.percorso+=self.deltax+self.deltay
+
+        if self.x<=globvars.board_RLMargin+self.width/2:
+            self.direction=0
+
+        if self.x>=globvars.board_W - globvars.board_RLMargin-self.width/2:
+            self.direction=math.pi
+
+        if self.y<=20:
+            self.isdead=True
+
+    def new_direction(self):
+        copia_direzioni=self.directionList[:]
+
+        for i in self.forbiddenDirections:
+            copia_direzioni.remove(i)
+
+        direzione_casuale=random.randint(0,len(copia_direzioni)-1)
+        self.direction=copia_direzioni[direzione_casuale]
