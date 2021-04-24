@@ -60,7 +60,7 @@ def crea_livello():
 
 
 	#Creo la griglia (mattoncini) di gioco: si inzia dal livello 1; poi si dovrà riaggiornarlo
-	SetGrid("utils\\Rosettas\\Test.csv")
+	SetGrid("utils\\Rosettas\\Level1a.csv")
 
 
 	for i in range(globvars.lifes):
@@ -107,6 +107,7 @@ def update(dt):
 		if globvars.vault is None and globvars.lifes>0:
 			pyglet.clock.schedule_once(crea_giocatore,1)
 
+		#muovo la navicella
 		if globvars.vault is not None:
 			globvars.vault.update(dt)
 
@@ -118,10 +119,67 @@ def update(dt):
 
 
 
+
+		#update blocchi powerup:
+		for p in globvars.alive_powerups:
+			p.update(dt)
+
+			if globvars.vault==None:
+				continue
+
+			if (p.x <= globvars.vault.x+globvars.vault.width//2 and p.x >= globvars.vault.x-globvars.vault.width//2) \
+			and (p.y - p.height//2 <= globvars.vault.y+globvars.vault.height//2):
+
+				globvars.GamePowerUpState=p.ptype
+				globvars.alive_powerups.remove(p)
+				p.delete()
+				break
+
+			if p.y<0:
+				globvars.alive_powerups.remove(p)
+				p.delete()	
+				break
+
+		# valuto l'effetto dei powerup attivi
+		if globvars.GamePowerUpState:
+
+			vaus_power_ups=["E","R","T","I"]
+
+			if globvars.GamePowerUpState=="N" and len(globvars.palline)>0 and len(globvars.palline)<3:
+
+				x=globvars.palline[0].x
+				y=globvars.palline[0].y
+				vx=globvars.palline[0].V_x
+				vy=globvars.palline[0].V_y
+
+				for i in range(3-len(globvars.palline)):
+
+					if y<20:
+						continue
+
+					globvars.palline.append(Pallina(x=x+(i+1)*10 ,y=y ,batch = globvars.main_batch, group=globvars.foreground,ismoving=True,vx=vx,vy=vy))
+					#print("Ho",len(globvars.palline),"palline")
+
+			if globvars.GamePowerUpState=="M" and len(globvars.palline)>0:
+				for pallina in globvars.palline:
+					if pallina.state!="2":
+						pallina.diventaNera()
+						pallina.state="2"
+
+			if globvars.GamePowerUpState in vaus_power_ups:
+				if globvars.vault.state!=globvars.GamePowerUpState:
+					globvars.vault.image=globvars.vault_anim_states[globvars.GamePowerUpState]
+					globvars.vault.state=globvars.GamePowerUpState
+
+			else:
+				if globvars.vault.image!=globvars.vault_anim_states["1"]:
+						globvars.vault.image=globvars.vault_anim_states["1"]
+						globvars.vault.state="1"
+
+
 		#update dei robini
 		for e in globvars.alive_enemies:
 			e.update(dt)
-			#print(e.x,e.y,e.deltax,e.deltay,e.direction,e.V,math.sin(e.direction),math.sin(e.direction)*e.V*dt)
 			#controllo che robino non entri in mattoncino
 			for brick in globvars.alive_bricks:
 
@@ -140,6 +198,10 @@ def update(dt):
 			#pallina colpisce navicella
 			if (pallina.x <= globvars.vault.x+globvars.vault.width//2 and pallina.x >= globvars.vault.x-globvars.vault.width//2) \
 			and (pallina.y - pallina.height//2 <= globvars.vault.y+globvars.vault.height//2):
+
+
+				if globvars.vault.state=="T" and pallina.x>55+globvars.vault.x-globvars.vault.width//2 and pallina.x<70+globvars.vault.x-globvars.vault.width//2:
+					continue
 
 				hit_pos=(pallina.x-globvars.vault.x)
 				angle=globvars.vault.get_ball_new_angle(hit_pos)
@@ -165,14 +227,17 @@ def update(dt):
 				if (pallina.x  <= brick.x + brick.width/2 and pallina.x >= brick.x - brick.width/2) \
 				and(pallina.y  <= brick.y+brick.height/2 and pallina.y  >= brick.y-brick.height/2):
 
+					if pallina.state!="2":
+						if not (pallina.last_x <= brick.x + brick.width/2 and pallina.last_x >= brick.x - brick.width/2):
+							pallina.V_x*=-1
 
-					if not (pallina.last_x <= brick.x + brick.width/2 and pallina.last_x >= brick.x - brick.width/2):
-						pallina.V_x*=-1
+						if not (pallina.last_y <= brick.y + brick.height/2 and pallina.last_y >= brick.y - brick.height/2):
+							pallina.V_y*=-1
 
-					if not (pallina.last_y <= brick.y + brick.height/2 and pallina.last_y >= brick.y - brick.height/2):
-						pallina.V_y*=-1
-
-					brick.life-=1
+					if pallina.state=="2":
+						brick.life=0
+					else:
+						brick.life-=1
 
 					if brick.life!=0:
 						globvars.flashes.append(Flash(x=brick.x ,y=brick.y, batch = globvars.main_batch, group=globvars.forestrings))
@@ -204,19 +269,27 @@ def update(dt):
 					
 
 	
-
+			# rimuovo i robini morti
 			for f in globvars.flashes:
 				if f.isdead:
 					f.delete()
 					globvars.flashes.remove(f)
 
+
+			# rimuovo i brick morti
 			for brick in globvars.alive_bricks:
 				if brick.isdead:
 
+					x=brick.x
+					y=brick.y
+
 					if brick.btype=="3":
-						x=brick.x
-						y=brick.y
 						pyglet.clock.schedule_once(resuscita_blocco, delay=10,x=x,y=y) 
+
+					#rilascio il corrispondente power up
+					if brick.PowerUP!=None:
+						powerup=PowerUP(x=x,y=y,ptype=brick.PowerUP,batch=globvars.main_batch,group=globvars.foreground)
+						globvars.alive_powerups.append(powerup)
 
 					brick.delete()
 					globvars.alive_bricks.remove(brick)
@@ -236,9 +309,12 @@ def update(dt):
 					player.play()
 
 
+
+
 		#controllo se pallina ancora in gioco
-		for pallina in globvars.palline:
+		for indp,pallina in enumerate(globvars.palline):
 			if pallina.isdead:
+				#print("pallina",indp,"morta")
 				pallina.delete()
 				globvars.palline.remove(pallina)
 
@@ -246,12 +322,13 @@ def update(dt):
 			if globvars.vault is not None:
 				globvars.vault.isdead=True
 
-
+		#controllo se navicella ancora in gioco
 		if globvars.vault is not None and globvars.vault.isdead:
 			x=globvars.vault.x
 			globvars.vault.delete()
 			globvars.vault=None
 			die_vault=pyglet.sprite.Sprite(globvars.vault_anim_states["2"], x=x ,y=25, batch=globvars.main_batch,group=globvars.foreground)
+			globvars.GamePowerUpState=None
 
 			player.next_source()
 			player.queue(globvars.die_sound)

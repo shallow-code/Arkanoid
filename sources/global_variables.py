@@ -5,7 +5,7 @@ def center_image(image):
     image.anchor_y = image.height // 2
 
 
-pyglet.resource.path = ['resources',"resources\\im","resources\\im\\nemici","resources\\audio"]
+pyglet.resource.path = ['resources',"resources\\im","resources\\im\\nemici","resources\\im\\powers","resources\\audio"]
 pyglet.resource.reindex()
 
 board_W=586
@@ -28,9 +28,11 @@ fase_of_game = 'crea_livello'
 
 pallina_start=pyglet.resource.image("Palla_start.png")
 pallina_im=pyglet.resource.image("PallaOriginal.png")
+pallina_nera=pyglet.resource.image("PallaNera.png")
 
 center_image(pallina_im)
 center_image(pallina_start)
+center_image(pallina_nera)
 
 bricks_im={}
 bricks_im["1"]= pyglet.resource.image("Type1.png")
@@ -50,6 +52,18 @@ Vault_Base_1 = pyglet.resource.image("VausBaseOriginal1.png")
 Vault_Base_2 = pyglet.resource.image("VausBaseOriginal2.png")
 Vault_Base_3 = pyglet.resource.image("VausBaseOriginal3.png")
 
+Vault_E_1 = pyglet.resource.image("Vaus_E1.png")
+Vault_E_2 = pyglet.resource.image("Vaus_E2.png")
+Vault_E_3 = pyglet.resource.image("Vaus_E3.png")
+
+Vault_R_1 = pyglet.resource.image("Vaus_R1.png")
+Vault_R_2 = pyglet.resource.image("Vaus_R2.png")
+Vault_R_3 = pyglet.resource.image("Vaus_R3.png")
+
+Vault_T_1 = pyglet.resource.image("Vaus_T1.png")
+Vault_T_2 = pyglet.resource.image("Vaus_T2.png")
+Vault_T_3 = pyglet.resource.image("Vaus_T3.png")
+
 Vault_Crate_1=pyglet.resource.image("VausDissolviOriginal1.png")
 Vault_Crate_2=pyglet.resource.image("VausDissolviOriginal2.png")
 Vault_Crate_3=pyglet.resource.image("VausDissolviOriginal3.png")
@@ -60,8 +74,23 @@ center_image(Vault_Base_3)
 center_image(Vault_Crate_1)
 center_image(Vault_Crate_2)
 center_image(Vault_Crate_3)
+center_image(Vault_E_1)
+center_image(Vault_E_2)
+center_image(Vault_E_3)
+
+center_image(Vault_R_1)
+center_image(Vault_R_2)
+center_image(Vault_R_3)
+
+center_image(Vault_T_1)
+center_image(Vault_T_2)
+center_image(Vault_T_3)
 
 seq_anim_vault_normal=[Vault_Base_1,Vault_Base_2,Vault_Base_3]
+seq_anim_vault_E=[Vault_E_1,Vault_E_2,Vault_E_3]
+seq_anim_vault_R=[Vault_R_1,Vault_R_2,Vault_R_3]
+seq_anim_vault_T=[Vault_T_1,Vault_T_2,Vault_T_3]
+
 seq_anim_vault_create=[Vault_Crate_3,Vault_Crate_2,Vault_Crate_1]
 seq_anim_vault_die=[Vault_Crate_1,Vault_Crate_2,Vault_Crate_3]
 
@@ -69,6 +98,9 @@ vault_anim_states={}
 vault_anim_states["0"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_create, 0.35, loop=False)
 vault_anim_states["1"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_normal, 0.25, loop=True)
 vault_anim_states["2"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_die, 0.25, loop=False)
+vault_anim_states["E"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_E, 0.25, loop=True)
+vault_anim_states["R"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_R, 0.25, loop=True)
+vault_anim_states["T"] = pyglet.image.Animation.from_image_sequence(seq_anim_vault_T, 0.25, loop=True)
 
 
 #mangione
@@ -132,6 +164,29 @@ Enemies["0"]=pyglet.image.Animation.from_image_sequence(Enemy_1,0.1, loop=True)
 EnemyExplosion=pyglet.image.Animation.from_image_sequence(EnemyExplosion,0.2,loop=False)
 
 
+#powerups
+
+PowerUP={}
+all_Powers=["N","M","E","R","T"]
+
+for P in all_Powers:
+	l_P=[]
+	l_P.append(pyglet.resource.image(P+"1.png"))
+	l_P.append(pyglet.resource.image(P+"2.png"))
+	l_P.append(pyglet.resource.image(P+"3.png"))
+	l_P.append(pyglet.resource.image(P+"4.png"))
+	l_P.append(pyglet.resource.image(P+"5.png"))
+	l_P.append(pyglet.resource.image(P+"6.png"))
+
+	for el in l_P:
+		center_image(el)
+
+	PowerUP[P]=pyglet.image.Animation.from_image_sequence(l_P,0.2,loop=True)
+
+
+
+
+
 
 
 lifes=5
@@ -181,3 +236,9 @@ alive_enemies=[]
 
 global Mangioni 
 Mangioni=[]
+
+global GamePowerUpState
+GamePowerUpState=None
+
+global alive_powerups
+alive_powerups=[]

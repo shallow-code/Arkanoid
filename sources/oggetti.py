@@ -48,31 +48,38 @@ class Player(pyglet.sprite.Sprite):
 
 
 class Pallina(pyglet.sprite.Sprite):
-    def __init__(self, *args, **kwargs):
+    def __init__(self,ismoving=False,vx=globvars.speed_platform,vy=0, *args, **kwargs):
         super().__init__(img=globvars.pallina_start, *args, **kwargs)
 
         self.isdead = False
-        self.isMoving=False
+        self.isMoving=ismoving
         self.state="0"
 
         self.key_handler = key.KeyStateHandler()
 
         self.V=globvars.speed_ball
-        self.V_x = globvars.speed_platform
-        self.V_y=0
+        self.V_x = vx
+        self.V_y = vy
 
         self.last_x=self.x
         self.last_y=self.y
 
-        pyglet.clock.schedule_once(self.start,delay=1)
+        if not self.isMoving: 
+            pyglet.clock.schedule_once(self.start,delay=1)
+        else:
+            self.image=globvars.pallina_im
+            self.state="1"
 
     def start(self,delay):
         self.image=globvars.pallina_im
         self.state="1"
 
-
     def get_distance(self,point):
         return math.sqrt((math.pow(self.x-point[0],2)+math.pow(self.y-point[1],2)))
+
+    def diventaNera(self):
+        self.image=globvars.pallina_nera
+        self.state="2"
 
 
     def update(self,dt):
@@ -163,13 +170,17 @@ class Mangione(pyglet.sprite.Sprite):
 
 class Brick(pyglet.sprite.Sprite):
     def __init__(self, btype,redivivo=False,*args, **kwargs):
-        super(Brick,self).__init__(img=globvars.bricks_im[btype], *args, **kwargs)
+        super(Brick,self).__init__(img=globvars.bricks_im[btype[:2]], *args, **kwargs)
 
         self.life=1
 
         self.btype=btype
         self.isdead=False
         self.redivivo=redivivo
+        self.PowerUP=None
+
+        if len(self.btype)==3:
+             self.PowerUP=self.btype[2]
 
         if btype=="4":
             self.life=-1
@@ -239,3 +250,20 @@ class Enemy(pyglet.sprite.Sprite):
 
         direzione_casuale=random.randint(0,len(copia_direzioni)-1)
         self.direction=copia_direzioni[direzione_casuale]
+
+
+
+
+
+#PowerUps
+class PowerUP(pyglet.sprite.Sprite):
+    def __init__(self, ptype, *args, **kwargs):
+        super().__init__(img=globvars.PowerUP[ptype], *args, **kwargs)
+
+        self.ptype=ptype
+        self.isdead=False
+
+        self.V=150
+
+    def update(self,dt):
+        self.y-=self.V*dt
