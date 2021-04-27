@@ -74,7 +74,7 @@ def crea_livello():
 
 def crea_giocatore(delay=0):
 	if globvars.vault==None:
-		globvars.vault=Player(x=globvars.board_W/2 ,y=25 ,batch = globvars.main_batch, group=globvars.foreground)
+		globvars.vault=Player(x=globvars.board_W/2 ,y=25 ,batch = globvars.main_batch, group=globvars.forestrings1)
 
 	#Creo pallina
 	if len(globvars.palline)==0:
@@ -111,12 +111,23 @@ def update(dt):
 		if globvars.vault is not None:
 			globvars.vault.update(dt)
 
+			#se ombra attiva
+			if "D1" in globvars.Vaus_Shadows.keys():
+				globvars.Vaus_Shadows["D1"].refxmin=globvars.vault.x
+				globvars.Vaus_Shadows["D2"].refxmin=globvars.Vaus_Shadows["D1"].x
+				globvars.Vaus_Shadows["D1"].refxmax=globvars.Vaus_Shadows["D2"].x
+				globvars.Vaus_Shadows["S1"].refxmin=globvars.vault.x
+				globvars.Vaus_Shadows["S2"].refxmin=globvars.Vaus_Shadows["S1"].x
+				globvars.Vaus_Shadows["S1"].refxmax=globvars.Vaus_Shadows["S2"].x
+
+				for stype in globvars.Vaus_Shadows.keys():
+					globvars.Vaus_Shadows[stype].update(dt)
+
 
 		#creo robini		
 		if globvars.numero_robini<3:
 			globvars.numero_robini+=1
 			pyglet.clock.schedule_once(apri_mangione,1+globvars.numero_robini*3.5)
-
 
 
 
@@ -143,7 +154,27 @@ def update(dt):
 		# valuto l'effetto dei powerup attivi
 		if globvars.GamePowerUpState:
 
-			vaus_power_ups=["E","R","T","I"]
+			vaus_power_ups=["E","R","T"]
+
+
+			if globvars.GamePowerUpState=="S":
+				for pallina in globvars.palline:
+					pallina.V=max(280,pallina.V-20)
+					globvars.speed_pallina=pallina.V
+				globvars.GamePowerUpState="SS"
+
+
+			if globvars.GamePowerUpState=="I" and ("D1" not in globvars.Vaus_Shadows.keys()):
+				globvars.Vaus_Shadows["D1"]=Vaus_Shadow(x=globvars.vault.x,y=globvars.vault.y,batch = globvars.main_batch, group=globvars.forestrings, stype="D1",refxmin=globvars.vault.x)
+				globvars.Vaus_Shadows["D2"]=Vaus_Shadow(x=globvars.vault.x,y=globvars.vault.y,batch = globvars.main_batch, group=globvars.foreground, stype="D2",refxmin=globvars.vault.x)
+				globvars.Vaus_Shadows["S1"]=Vaus_Shadow(x=globvars.vault.x,y=globvars.vault.y,batch = globvars.main_batch, group=globvars.forestrings, stype="S1",refxmin=globvars.vault.x)
+				globvars.Vaus_Shadows["S2"]=Vaus_Shadow(x=globvars.vault.x,y=globvars.vault.y,batch = globvars.main_batch, group=globvars.foreground, stype="S2",refxmin=globvars.vault.x)
+
+
+			if globvars.GamePowerUpState!="I":
+				for stype in globvars.Vaus_Shadows.keys():
+					globvars.Vaus_Shadows[stype].delete()
+				globvars.Vaus_Shadows={}
 
 			if globvars.GamePowerUpState=="N" and len(globvars.palline)>0 and len(globvars.palline)<3:
 
@@ -158,7 +189,26 @@ def update(dt):
 						continue
 
 					globvars.palline.append(Pallina(x=x+(i+1)*10 ,y=y ,batch = globvars.main_batch, group=globvars.foreground,ismoving=True,vx=vx,vy=vy))
-					#print("Ho",len(globvars.palline),"palline")
+
+
+
+			if globvars.GamePowerUpState=="D" and len(globvars.palline)>0 and len(globvars.palline)<8:
+
+				x=globvars.palline[0].x
+				y=globvars.palline[0].y
+				vx=globvars.palline[0].V_x
+				vy=globvars.palline[0].V_y
+
+				for i in range(8-len(globvars.palline)):
+
+					if y<20:
+						continue
+
+					globvars.palline.append(Pallina(x=x+(i+1)*10 ,y=y ,batch = globvars.main_batch, group=globvars.foreground,ismoving=True,vx=vx,vy=vy))
+
+				globvars.GamePowerUpState="DD"
+
+
 
 			if globvars.GamePowerUpState=="M" and len(globvars.palline)>0:
 				for pallina in globvars.palline:
@@ -196,14 +246,26 @@ def update(dt):
 
 
 			#pallina colpisce navicella
-			if (pallina.x <= globvars.vault.x+globvars.vault.width//2 and pallina.x >= globvars.vault.x-globvars.vault.width//2) \
-			and (pallina.y - pallina.height//2 <= globvars.vault.y+globvars.vault.height//2):
+			deltaVausR=globvars.vault.x+globvars.vault.width//2
+			deltaVausL=globvars.vault.x-globvars.vault.width//2
 
+			if globvars.GamePowerUpState=="I":
+				deltaVausL=min(deltaVausL,globvars.Vaus_Shadows["S2"].x-globvars.Vaus_Shadows["S2"].width//2)
+				deltaVausR=max(deltaVausR,globvars.Vaus_Shadows["D2"].x+globvars.Vaus_Shadows["D2"].width//2)
+
+			if (pallina.x <= deltaVausR and pallina.x >=deltaVausL ) \
+			and (pallina.y - pallina.height//2 <= globvars.vault.y+globvars.vault.height//2):
 
 				if globvars.vault.state=="T" and pallina.x>55+globvars.vault.x-globvars.vault.width//2 and pallina.x<70+globvars.vault.x-globvars.vault.width//2:
 					continue
 
 				hit_pos=(pallina.x-globvars.vault.x)
+				if globvars.GamePowerUpState=="I":
+					if pallina.x>globvars.vault.x:
+						hit_pos=pallina.x-(globvars.vault.x+globvars.Vaus_Shadows["D2"].x)/2
+					if pallina.x<globvars.vault.x:
+						hit_pos=pallina.x-(globvars.vault.x+globvars.Vaus_Shadows["S2"].x)/2
+
 				angle=globvars.vault.get_ball_new_angle(hit_pos)
 
 				#print("palla/navicella",hit_pos,angle)
@@ -329,6 +391,10 @@ def update(dt):
 			globvars.vault=None
 			die_vault=pyglet.sprite.Sprite(globvars.vault_anim_states["2"], x=x ,y=25, batch=globvars.main_batch,group=globvars.foreground)
 			globvars.GamePowerUpState=None
+
+			for stype in globvars.Vaus_Shadows.keys():
+				globvars.Vaus_Shadows[stype].delete()
+			globvars.Vaus_Shadows={}
 
 			player.next_source()
 			player.queue(globvars.die_sound)

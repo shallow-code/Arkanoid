@@ -20,7 +20,7 @@ vault_W=73
 
 
 speed_platform=500
-speed_ball=400
+speed_ball=300
 speed_enemy=50
 
 
@@ -67,7 +67,14 @@ Vault_T_3 = pyglet.resource.image("Vaus_T3.png")
 Vault_Crate_1=pyglet.resource.image("VausDissolviOriginal1.png")
 Vault_Crate_2=pyglet.resource.image("VausDissolviOriginal2.png")
 Vault_Crate_3=pyglet.resource.image("VausDissolviOriginal3.png")
-#Vault_Crate_4=pyglet.resource.image("Vault_Dissolvi_3.png")
+
+
+Vault_Shadow_D1 = pyglet.resource.image("Shadow_D1.png")
+Vault_Shadow_D2 = pyglet.resource.image("Shadow_D2.png")
+Vault_Shadow_S1 = pyglet.resource.image("Shadow_S1.png")
+Vault_Shadow_S2 = pyglet.resource.image("Shadow_S2.png")
+
+
 center_image(Vault_Base_1)
 center_image(Vault_Base_2)
 center_image(Vault_Base_3)
@@ -85,6 +92,18 @@ center_image(Vault_R_3)
 center_image(Vault_T_1)
 center_image(Vault_T_2)
 center_image(Vault_T_3)
+
+center_image(Vault_Shadow_D1)
+center_image(Vault_Shadow_D2)
+center_image(Vault_Shadow_S1)
+center_image(Vault_Shadow_S2)
+
+VausShadows_im={}
+VausShadows_im["D1"]=Vault_Shadow_D1
+VausShadows_im["D2"]=Vault_Shadow_D2
+VausShadows_im["S1"]=Vault_Shadow_S1
+VausShadows_im["S2"]=Vault_Shadow_S2
+
 
 seq_anim_vault_normal=[Vault_Base_1,Vault_Base_2,Vault_Base_3]
 seq_anim_vault_E=[Vault_E_1,Vault_E_2,Vault_E_3]
@@ -167,7 +186,7 @@ EnemyExplosion=pyglet.image.Animation.from_image_sequence(EnemyExplosion,0.2,loo
 #powerups
 
 PowerUP={}
-all_Powers=["N","M","E","R","T"]
+all_Powers=["N","M","E","R","T","I","D","S"]
 
 for P in all_Powers:
 	l_P=[]
@@ -206,7 +225,7 @@ main_batch = pyglet.graphics.Batch()
 background = pyglet.graphics.OrderedGroup(0)
 foreground = pyglet.graphics.OrderedGroup(1)
 forestrings = pyglet.graphics.OrderedGroup(2)
-
+forestrings1 = pyglet.graphics.OrderedGroup(3)
 
 hit_sound1 = pyglet.resource.media('Arkanoid 2 - Revenge of Doh SFX (HitSound1).wav', streaming=False)
 hit_sound2 = pyglet.resource.media('Arkanoid 2 - Revenge of Doh SFX (HitSound2).wav', streaming=False)
@@ -242,3 +261,6 @@ GamePowerUpState=None
 
 global alive_powerups
 alive_powerups=[]
+
+global Vaus_Shadows
+Vaus_Shadows={}

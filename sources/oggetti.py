@@ -115,15 +115,21 @@ class Pallina(pyglet.sprite.Sprite):
                 if self.y >= globvars.board_H - globvars.board_RLMargin:
                     self.V_y*=-1
                     self.y = globvars.board_H - globvars.board_RLMargin
+                    self.V=min(self.V+10,600)
+                    globvars.speed_ball=self.V
 
                 if self.x >= globvars.board_W - globvars.board_RLMargin: 
                     self.V_x*=-1
                     self.x=globvars.board_W - globvars.board_RLMargin
+                    self.V=min(self.V+5,600)
+                    globvars.speed_ball=self.V
 
 
                 if self.x <= globvars.board_RLMargin:
                     self.V_x*=-1
                     self.x= globvars.board_RLMargin
+                    self.V=min(self.V+5,600)
+                    globvars.speed_ball=self.V
 
                 if self.y<=0:
                     self.isdead=True
@@ -267,3 +273,55 @@ class PowerUP(pyglet.sprite.Sprite):
 
     def update(self,dt):
         self.y-=self.V*dt
+
+
+#stype: S,D
+class Vaus_Shadow(pyglet.sprite.Sprite):
+    def __init__(self, stype, refxmin, refxmax=-1, *args, **kwargs):
+        super().__init__(img=globvars.VausShadows_im[stype], *args, **kwargs)
+
+        self.key_handler = key.KeyStateHandler()
+        self.stype=stype
+        self.V_x=globvars.speed_platform/3
+        self.refxmin=refxmin
+        self.refxmax=refxmax
+
+        if "D" in self.stype:
+            self.V_x*=-1
+
+       
+
+    def update(self,dt):
+
+        if not (self.key_handler[key.LEFT] or self.key_handler[key.RIGHT]):
+            if "1" in self.stype:
+                if abs(self.x-self.refxmin)>1 and abs(self.x-self.refxmax)<2:
+                    self.x += self.V_x * dt
+            elif "1" not in self.stype:
+                self.x += self.V_x * dt
+        
+        if "D" in self.stype:
+            if (self.x - self.refxmin)<0:
+                self.x=self.refxmin
+        if "S" in self.stype:
+            if (self.x - self.refxmin)>0:
+                self.x=self.refxmin            
+
+        if self.stype=="D1":
+                    
+            if (self.x - self.refxmin)>64:
+                self.x=self.refxmin+64
+
+        if self.stype=="D2":
+                    
+            if (self.x - self.refxmin)>45:
+                self.x=self.refxmin+45
+
+        if self.stype=="S1":
+            if (self.refxmin-self.x)>64:
+                self.x=self.refxmin-64            
+
+        if self.stype=="S2":
+            if (self.refxmin-self.x)>45:
+                self.x=self.refxmin-45 
+
